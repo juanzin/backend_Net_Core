@@ -8,7 +8,6 @@ on:
     # Only trigger if the push happens on these branches
     branches:
       - main
-      - develop
 
   # Also run the workflow when a Pull Request is created or updated
   pull_request:
