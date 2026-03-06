@@ -1,0 +1,53 @@
+# Name of the workflow shown in the GitHub Actions interface
+name: .NET CI Pipeline
+
+# Defines when the workflow should run
+on:
+  # Run the workflow every time code is pushed
+  push:
+    # Only trigger if the push happens on these branches
+    branches:
+      - main
+      - develop
+
+  # Also run the workflow when a Pull Request is created or updated
+  pull_request:
+
+# A workflow can have multiple jobs; here we define one job
+jobs:
+
+  # Name of the job (you can choose any name)
+  build-and-test:
+
+    # Defines the machine that will run the job
+    # GitHub will create a temporary Linux VM
+    runs-on: ubuntu-latest
+
+    # Steps are executed sequentially
+    steps:
+
+      # Step 1: Download the repository code into the runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install the .NET SDK on the runner
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # Version of .NET SDK to install
+          dotnet-version: '8.0.x'
+
+      # Step 3: Download project dependencies (NuGet packages)
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Step 4: Compile the project
+      - name: Build project
+        # --no-restore avoids restoring dependencies again
+        # --configuration Release builds the optimized version
+        run: dotnet build --no-restore --configuration Release
+
+      # Step 5: Run unit tests in the solution
+      - name: Run tests
+        # --no-build skips building again since it was already done
+        run: dotnet test --no-build --configuration Release
